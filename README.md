@@ -27,6 +27,7 @@ Transform old black-and-white images into vibrant, realistic color using a pretr
       1.original grayscale and colorized results together.
 
 ## 📂 Project Structure
+![Project Structure]()
 
 
 
