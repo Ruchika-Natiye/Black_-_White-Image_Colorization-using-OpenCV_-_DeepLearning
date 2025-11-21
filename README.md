@@ -8,23 +8,23 @@ Transform old black-and-white images into vibrant, realistic color using a pretr
 
 ✔ Deep Learning Based Colorization
 
-    1.Uses the official colorization_release_v2.caffemodel
+  1.Uses the official colorization_release_v2.caffemodel
 
-    2.Adds color based on 313 ab cluster centers
+  2.Adds color based on 313 ab cluster centers
 
-    3.Produces natural color tones
+  3.Produces natural color tones
 
 ✔ Simple & Fast
 
-    1.Requires only OpenCV and NumPy
+   1.Requires only OpenCV and NumPy
 
-    2.Works on CPU—no GPU needed
+   2.Works on CPU—no GPU needed
 
-    3.Output generated in milliseconds
+   3.Output generated in milliseconds
 
 ✔ Side-by-Side Comparison
 
-    1.original grayscale and colorized results together.
+   1.original grayscale and colorized results together.
 
 📂 Project Structure
 
