@@ -29,5 +29,8 @@ Transform old black-and-white images into vibrant, realistic color using a pretr
 ## 📂 Project Structure
 ![Project Structure](https://github.com/Ruchika-Natiye/Black_-_White-Image_Colorization-using-OpenCV_-_DeepLearning/blob/14e2b0dd58fe1220647762b5b9b43f21a18bf1af/project%20structure.png)
 
+## Python Script
+```python
+
 
 
