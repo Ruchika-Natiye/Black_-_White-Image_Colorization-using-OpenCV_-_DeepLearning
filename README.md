@@ -126,7 +126,7 @@ lab_img = cv2.cvtColor(scaled, cv2.COLOR_BGR2LAB)
 
   * After conversion with float inputs in range 0..1, L is approx 0..100 and a,b centered around 0 (but exact ranges depend on implementation).
 
-  ### 5) Prepare and inject cluster centers into the network
+### 5) Prepare and inject cluster centers into the network
  ```python
 class8 = net.getLayerId("class8_ab")
 conv8 = net.getLayerId("conv8_313_rh")
@@ -143,3 +143,71 @@ net.getLayer(conv8).blobs = [np.full([1, 313], 2.606, dtype="float32")]
 * net.getLayer(class8).blobs = [pts.astype("float32")] inserts these cluster centers into the class8_ab layer as its learned “weights”.
 
 * net.getLayer(conv8).blobs = [np.full([1, 313], 2.606,...)] sets a prior scaling or bias (the constant 2.606 is used in the original implementation).
+
+### 6) Resize input for the network and prepare L channel
+```python
+resized = cv2.resize(lab_img, (224, 224))
+L = cv2.split(resized)[0]
+L -= 50
+```
+* The network expects a 224×224 L-channel input (as in the original model).
+
+* resized is LAB image at the network input size.
+
+* L = cv2.split(resized)[0] extracts the L channel (shape 224 x 224).
+
+* L -= 50 subtracts 50 (mean-centering). This normalization mirrors the preprocessing used when the model was trained.
+
+### 7) Forward pass to predict ab channels
+```python
+net.setInput(cv2.dnn.blobFromImage(L))
+ab_channel = net.forward()[0, :, :, :].transpose((1, 2, 0))
+```
+* cv2.dnn.blobFromImage(L) converts the single-channel L into a 4D blob with shape (1, 1, 224, 224) (batch, channels, height, width) as expected by the DNN.
+
+* net.forward() runs inference and returns the network output. For this model the output shape is roughly (1, 313, 56, 56) or similar — i.e., a distribution over 313 bins for each spatial cell.
+
+* [0, :, :, :] selects the first (and only) batch item.
+
+* .transpose((1, 2, 0)) reorders the axes so the result becomes (H_net, W_net, 313). However, note: in many implementations an extra step maps the 313-d distribution to 2 channels (real a and b) before resizing. In this script the model output already yields ab predictions shaped as 2 channels after internal processing.
+
+### 8) Resize predicted ab to original image size
+```python
+ab_channel = cv2.resize(ab_channel, (img.shape[1], img.shape[0]))
+L_original = cv2.split(lab_img)[0]
+```
+* cv2.resize upscales the predicted chroma channels to the original image width and height: (W, H) where img.shape[1] is width and img.shape[0] is height.
+
+* L_original extracts the original L channel from lab_img (same size as img), so merging will use the original image’s luminance (preserves fine detail and resolution).
+
+### 9) Merge L + predicted ab, convert back to BGR, clip and convert types
+```python
+colorized = np.concatenate((L_original[:, :, np.newaxis], ab_channel), axis=2)
+colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
+colorized = np.clip(colorized, 0, 1)
+colorized = (255 * colorized).astype("uint8")
+```
+* np.concatenate: forms a LAB image (H x W x 3) by stacking L (shape H x W x 1) with ab_channel (shape H x W x 2).
+
+* cv2.cvtColor(..., cv2.COLOR_LAB2BGR): converts the LAB color image back to BGR color space.
+
+* np.clip(..., 0, 1) ensures values remain in the normalized float range [0,1]. This is important to avoid wraparound when converting to uint8.
+
+* (255 * colorized).astype("uint8") scales floats back to 0-255 and casts to uint8 for display/saving.
+
+### 10) Display the result side-by-side
+```python
+result = cv2.hconcat([img, colorized])
+cv2.imshow("Grayscale → Colour", result)
+cv2.waitKey(0)
+```
+* cv2.hconcat horizontally concatenates the original image and the colorized image for comparison.
+
+* cv2.imshow opens a GUI window with the result.
+
+* cv2.waitKey(0) waits indefinitely for a key press to close the window.
+  
+## 📊 Output Example
+Original	                                                                                                         Colorized
+![image alt]()
+
