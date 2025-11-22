@@ -208,6 +208,20 @@ cv2.waitKey(0)
 * cv2.waitKey(0) waits indefinitely for a key press to close the window.
   
 ## 📊 Output Example
-Original	                                                                                                         Colorized
-![image alt]()
+	                                                                                                         
+![image alt](https://github.com/Ruchika-Natiye/Black_-_White-Image_Colorization-using-OpenCV_-_DeepLearning/blob/da0670fad62b60e157f03962d60cd2668f56039a/Output1.png)
 
+## 📚 References
+
+* Zhang, Richard, et al. "Colorful Image Colorization." ECCV 2016.
+
+* OpenCV DNN Documentation: https://docs.opencv.org/
+
+## ❤️ Contributing
+
+Pull requests are welcome!
+If you find a bug or want a feature, feel free to open an issue.
+
+## ⭐ Show Support
+
+If this project helped you, please ⭐ the repository — it motivates me to create more!
